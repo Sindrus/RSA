@@ -49,11 +49,12 @@ void mod_inv( mpz_t r, mpz_t a, mpz_t b ){
     mpz_init_set( a1, a );
     mpz_init_set_ui( x0, 0 );
     mpz_init_set_ui( x1, 1 );
-
+/*
     while (a > 1) {
         q = a / b;
         t = b, b = a % b, a = t;
         t = x0, x0 = x1 - q * x0, x1 = t;
+*/
 
     if( mpz_cmp_ui( b1, 1 ) == 0 )
         return;
