@@ -2,7 +2,7 @@ CC = gcc
 TOP = .
 CFLAGS = -g -std=c99
 COMPILE = $(CC) $(CFLAGS)
-PROGRAMS = clean testmod rsa
+PROGRAMS = testmod rsa
 
 all: $(PROGRAMS)
 

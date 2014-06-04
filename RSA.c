@@ -49,19 +49,13 @@ void mod_inv( mpz_t r, mpz_t a, mpz_t b ){
     mpz_init_set( a1, a );
     mpz_init_set_ui( x0, 0 );
     mpz_init_set_ui( x1, 1 );
-/*
-    while (a > 1) {
-        q = a / b;
-        t = b, b = a % b, a = t;
-        t = x0, x0 = x1 - q * x0, x1 = t;
-*/
 
     if( mpz_cmp_ui( b1, 1 ) == 0 )
         return;
 
-    while( mpz_cmp_ui( a1, 1 ) > 1 ){
+    while( mpz_cmp_si( a1, 1 ) > 0 ){
         mpz_fdiv_q( q, a1, b1 );
-        mpz_set( t, a1 );
+        mpz_set( t, b1 );
         mpz_mod( b1, a1, b1 );
         mpz_set( a1, t );
         mpz_set( t, x0 );
@@ -98,46 +92,64 @@ void gen_coprime( mpz_t coprime, mpz_t upper_bound ){
     }while( mpz_cmp_si( coprime_r, 1 ) != 0 );
 
     mpz_set( coprime, test_number );
+
+    mpz_clear( test_number );
+    mpz_clear( coprime_r );
 }
 
-/*void key_gen( mpz_t n, mpz_t p, mpz_t q, mpz_t b ){
-    mpz_t b1, b2;
+void key_gen( mpz_t d, mpz_t e, mpz_t n, mpz_t p, mpz_t q ){
+
+    mpz_t b1, b2, totient;
     mpz_init( b1 );
     mpz_init( b2 );
-    mpz_sub( b1, p, 1 );
-    mpz_sub( b2, q, 1 );
+    mpz_init( totient );
 
     mpz_mul( n, p, q );
 
-    mpz_mul( b, b1, b2 );
-    gen_coprime( n, p );
+    mpz_sub_ui( b1, p, 1 );
+    mpz_sub_ui( b2, q, 1 );
+    mpz_mul( totient, b1, b2 );
+    gen_coprime( e, totient );
+    mod_inv( d, e, totient );
+
+    mpz_clear( b1 );
+    mpz_clear( b2 );
+    mpz_clear( totient );
 }
-*/
+
 int main(){
     
-/*    mpz_t i;
-*/
-    mpz_t p, q, n;//, b1, b2;
+    mpz_t p, q, e, d, n, m, mc, cm ;
     mpz_init( p );
     mpz_init( q );
+    mpz_init( e );
+    mpz_init( d );
     mpz_init( n );
-    mpz_set_str( p, "42", 10 );
-    mpz_set_str( q, "2017", 10 );
-    //mpz_set_str( p, "3120", 10 );
-    //mpz_set_str( q, "54", 10 );
-    //mpz_set_str( p, "15485863", 10 );
-    //mpz_set_str( q, "13849831", 10 );
-    //gen_coprime( n, p );
+    mpz_init( mc );
+    mpz_init( cm );
+    mpz_init_set_ui( m, 65 );
+    mpz_set_str( p, "15485863", 10 );
+    mpz_set_str( q, "13849831", 10 );
 
-    mod_inv( n, p, q );
+    key_gen( d, e, n, p, q );
 
-    mpz_out_str( stdout, 10, p );
-    printf( " mod " );
-    mpz_out_str( stdout, 10, q );
+    mpz_powm( cm, m, e, n );
+    mpz_powm( mc, cm, d, n );
+
+    mpz_out_str( stdout, 10, m );
     printf( "\n" );
-    printf( "inverse: " );
-    mpz_out_str( stdout, 10, n );
+    mpz_out_str( stdout, 10, cm );
+    printf( "\n" );
+    mpz_out_str( stdout, 10, mc );
     printf( "\n" );
 
+    mpz_clear( p );
+    mpz_clear( q );
+    mpz_clear( e );
+    mpz_clear( d );
+    mpz_clear( n );
+    mpz_clear( m );
+    mpz_clear( mc );
+    mpz_clear( cm );
     return 0;
 }
