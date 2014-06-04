@@ -4,20 +4,9 @@
 #include <gmp.h>
 
 /*
-
 https://www.cs.colorado.edu/~srirams/classes/doku.php/gmp_usage_tutorial
 
 https://gmplib.org/manual/Integer-Functions.html
-
-void mpz_powm_ui (mpz_t rop, const mpz_t base, unsigned long int exp, const mpz_t mod)
-    Set rop to (base raised to exp) modulo mod.
-    Negative exp is supported if an inverse base^-1 mod mod exists (see mpz_invert in 
-    Number Theoretic Functions). If an inverse doesn't exist then a divide by zero is raised. 
-
-void mpz_ui_pow_ui (mpz_t rop, unsigned long int base, unsigned long int exp)
-void mpz_add (mpz_t rop, const mpz_t op1, const mpz_t op2)
-void mpz_sub (mpz_t rop, const mpz_t op1, const mpz_t op2)
-void mpz_mul (mpz_t rop, const mpz_t op1, const mpz_t op2)
 */
 
 void gcd( mpz_t r, mpz_t a, mpz_t b ){
