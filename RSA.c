@@ -99,10 +99,12 @@ void key_gen(){
     mpz_init( b2 );
     mpz_init( totient );
 
-    mpz_set_str( p, "15485863", 10 );
-    mpz_set_str( q, "13849831", 10 );
-    mpz_set_str( p, "2059519673", 10 );
-    mpz_set_str( q, "2059519669", 10 );
+    //mpz_set_str( p, "15485863", 10 );
+    //mpz_set_str( q, "13849831", 10 );
+    //mpz_set_str( p, "2059519673", 10 );
+    //mpz_set_str( q, "2059519669", 10 );
+    mpz_set_str( p, "103", 10 );
+    mpz_set_str( q, "107", 10 );
 
     mpz_mul( n, p, q );
 
@@ -160,18 +162,35 @@ void find_and_print_prime(){
  **/
 void cryptwork( mpz_t r, mpz_t m, mpz_t ed, mpz_t n ){
     mpz_powm( r, m, ed, n );
-/*    mpz_t iters, counter, holder;
-    mpz_init_set( iters, ed );
-    mpz_init_set_ui( counter, 0 );
-    mpz_init_set( holder, m );
-    for( ; mpz_cmp( iters, counter ) > 0 ; mpz_add_ui( counter, counter, 1 ) ){
-        mpz_mul( holder, holder, holder );
-        mpz_mod( holder, holder, n );
+}
+
+// Binary method
+void cryptwork2( mpz_t r, mpz_t m, mpz_t ed, mpz_t n ){
+    mp_bitcnt_t b;
+    mpz_t c;
+    unsigned int k = mpz_sizeinbase( ed, 2 );
+
+    if( mpz_tstbit( ed, k-1 ) == 1 )
+        mpz_init_set( c, m );
+    else
+        mpz_init_set_ui( c, 1 );
+
+    for( unsigned int i = k-1; i > 0; i-- ){
+        mpz_mul( c, c, c );
+        mpz_mod( c, c, n );
+
+        if( mpz_tstbit( ed, i-1 ) == 1 ){
+            mpz_mul( c, c, m );
+            mpz_mod( c, c, n );
+        }
     }
-    mpz_set( r, holder );
-    mpz_pow( holder, holder, ed );
-    mpz_mod( holder, holder, n );
-    mpz_set( r, holder );*/ 
+    mpz_set( r, c );
+    mpz_clear( c );
+}
+
+// m-ary method
+void cryptwork3( mpz_t r, mpz_t m, mpz_t ed, mpz_t n ){
+    
 }
 
 int main(){
@@ -179,25 +198,29 @@ int main(){
     //find_and_print_prime();
     // Do not enable this during testing
     //key_gen();
-
     mpz_t m, e, d, n, iters, counter;
-    mpz_init_set_str( iters, "10000", 10 );
+    mpz_init_set_str( iters, "1", 10 );
     mpz_init_set_str( counter, "0", 10 );
-    mpz_init_set_str( m, "64", 10 );
+    mpz_init_set_str( m, "42", 10 );
+
     mpz_init_set_str( e, "830738740898882569", 10 );
     mpz_init_set_str( d, "2461176518949177529", 10 );
     mpz_init_set_str( n, "4241621275235948237", 10 );
 
+    //mpz_init_set_str( e, "3269", 10 );
+    //mpz_init_set_str( d, "9833", 10 );
+    //mpz_init_set_str( n, "11021", 10 );
+
     for( ; mpz_cmp( iters, counter ) > 0 ; mpz_add_ui( counter, counter, 1 ) ){
-        //printf( "sta msg: " );
-        //mpz_out_str( stdout, 10, m );
+        printf( "sta msg: " );
+        mpz_out_str( stdout, 10, m );
         cryptwork( m, m, e, n );
-        //printf( "\nmid msg: " );
-        //mpz_out_str( stdout, 10, m );
+        printf( "\nmid msg: " );
+        mpz_out_str( stdout, 10, m );
         cryptwork( m, m, d, n );
-        //printf( "\nend msg: " );
-        //mpz_out_str( stdout, 10, m );
-        //printf( "\n" );
+        printf( "\nend msg: " );
+        mpz_out_str( stdout, 10, m );
+        printf( "\n" );
     }
 
     mpz_clear( m );
