@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <gmp.h>
+#include <math.h>
 
 /*
 https://www.cs.colorado.edu/~srirams/classes/doku.php/gmp_usage_tutorial
@@ -160,8 +161,23 @@ void find_and_print_prime(){
   * r is the return value, m is the message, ed is the exponent, n is the mod factor
   *
  **/
-void cryptwork( mpz_t r, mpz_t m, mpz_t ed, mpz_t n ){
+void cryptwork0( mpz_t r, mpz_t m, mpz_t ed, mpz_t n ){
     mpz_powm( r, m, ed, n );
+}
+
+void cryptwork( mpz_t r, mpz_t m, mpz_t ed, mpz_t n ){
+    mpz_t c, counter;
+    mpz_init_set_ui( c, 1 );
+    mpz_init_set_ui( counter, 0 );
+    
+    for( ; mpz_cmp( ed, counter ) > 0 ; mpz_add_ui( counter, counter, 1 ) ){
+        mpz_mul( c, c, m );
+        mpz_mod( c, c, n );
+    }
+    mpz_set( m, c );
+    mpz_clear( c );
+    mpz_clear( counter );
+
 }
 
 // Binary method
@@ -188,9 +204,82 @@ void cryptwork2( mpz_t r, mpz_t m, mpz_t ed, mpz_t n ){
     mpz_clear( c );
 }
 
-// m-ary method
-void cryptwork3( mpz_t r, mpz_t m, mpz_t ed, mpz_t n ){
+    // m-ary method (m=4)
+void cryptwork3( mpz_t ret, mpz_t m, mpz_t ed, mpz_t n ){
+    int mary = 3;
+    unsigned int r = mary;
+    unsigned int k = mpz_sizeinbase( ed, 2 );
+    unsigned int s = 0;
+    for( int i = 0; i < mary ; i++ )
+        s += pow( 2, i );
+
+    if( k % r != 0 )
+        k += r - (k % r );
+
+    mpz_t *Fs, c, tmp;
+    mpz_init( tmp );
+    char *sr;
+    sr = malloc( k );
+    if( sr == NULL ){
+        printf( "no memory\n" );
+        exit(0);
+    }
+    Fs = malloc( (s+1)*sizeof( mpz_t ) );
     
+    int j = 0;
+    for( int i=(int)k; i> 0; i-- ){
+        if( i > mpz_sizeinbase( ed, 2 ) ){
+            sr[ j ] = '0';
+        }else{
+            sr[ j ] = '0'+mpz_tstbit( ed, i-1 );
+        }
+        j++;
+    }
+
+    mpz_t w1, w2, wn;
+    mpz_init_set_ui( w1, 1 );
+    mpz_set( Fs[ 0 ],  w1);
+    mpz_init_set( w2, m );
+    mpz_set( Fs[ 1 ], w2);
+    mpz_init( c );
+
+    for( int i=2; i < s+1; i++ ){
+        mpz_init( wn );
+        mpz_mul( wn, m, Fs[ i-1 ] );
+        mpz_mod( wn, wn, n );
+        mpz_set( Fs[ i ], wn );
+    }
+
+
+    int dec = 0;
+    int i = 0;
+    int pow2 = pow( 2, r );
+    for( ; i < r; i++ )
+        dec = dec * 2 + (sr[i] == '1' ? 1 : 0);
+    
+    mpz_set( c, Fs[ dec ] );
+    mpz_mod( c, c, n );
+
+    mpz_set_ui( tmp, 0 );
+    for( int j = s-1; j > 0; j-- ){
+        dec = 0;
+        for( ; i < r; i++ )
+            dec = dec * 2 + (sr[i] == '1' ? 1 : 0);
+        mpz_pow_ui( c, c, pow2 );
+        mpz_mod( c, c, n );
+        if( dec != 0 ){
+            mpz_powm( c, c, m, Fs[ dec ] );
+        }
+    }
+
+
+    mpz_set( m, c );
+
+    mpz_clear( *Fs );
+    mpz_clear( w1 );
+    mpz_clear( w2 );
+    mpz_clear( tmp );
+    free( sr );
 }
 
 int main(){
