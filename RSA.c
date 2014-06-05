@@ -106,7 +106,8 @@ void key_gen( mpz_t d, mpz_t e, mpz_t n, mpz_t p, mpz_t q ){
     mpz_clear( totient );
 }
 
-int main(){
+void make_and_print_keys(){
+
     
     mpz_t p, q, e, d, n, m, mc, cm ;
     mpz_init( p );
@@ -121,7 +122,9 @@ int main(){
     mpz_set_str( q, "13849831", 10 );
 
     key_gen( d, e, n, p, q );
-
+}
+/*
+void encrypt(){
     mpz_powm( cm, m, e, n );
     mpz_powm( mc, cm, d, n );
 
@@ -140,5 +143,23 @@ int main(){
     mpz_clear( m );
     mpz_clear( mc );
     mpz_clear( cm );
+}
+*/
+void find_and_print_prime(){
+    mpz_t p, iters, counter;
+    mpz_init_set_str( p, "15485863", 10 );
+    mpz_init_set_str( iters, "1000000", 10 );
+    mpz_init_set_ui( counter, 0 );
+    for( ; mpz_cmp( iters, counter ) > 0 ; mpz_add_ui( counter, counter, 1 ) ){
+        printf( "looking for prime" );
+        mpz_nextprime( p, p );
+    }
+    printf( "found prime:\n" );
+    mpz_out_str( stdout, 10, p );
+    printf( "\n" );
+}
+
+int main(){
+    find_and_print_prime();
     return 0;
 }
