@@ -86,12 +86,23 @@ void gen_coprime( mpz_t coprime, mpz_t upper_bound ){
     mpz_clear( coprime_r );
 }
 
-void key_gen( mpz_t d, mpz_t e, mpz_t n, mpz_t p, mpz_t q ){
+void key_gen(){
 
+    mpz_t p, q, e, d, n;
     mpz_t b1, b2, totient;
+    mpz_init( p );
+    mpz_init( q );
+    mpz_init( e );
+    mpz_init( d );
+    mpz_init( n );
     mpz_init( b1 );
     mpz_init( b2 );
     mpz_init( totient );
+
+    mpz_set_str( p, "15485863", 10 );
+    mpz_set_str( q, "13849831", 10 );
+    mpz_set_str( p, "2059519673", 10 );
+    mpz_set_str( q, "2059519669", 10 );
 
     mpz_mul( n, p, q );
 
@@ -101,50 +112,30 @@ void key_gen( mpz_t d, mpz_t e, mpz_t n, mpz_t p, mpz_t q ){
     gen_coprime( e, totient );
     mod_inv( d, e, totient );
 
+    printf( "Generated the following keys:\nN:\n" );
+    mpz_out_str( stdout, 10, n );
+    printf( "\nE: \n" );
+    mpz_out_str( stdout, 10, e );
+    printf( "\nD: \n" );
+    mpz_out_str( stdout, 10, d );
+    printf( "\n" );
+
     mpz_clear( b1 );
     mpz_clear( b2 );
+    mpz_clear( p );
+    mpz_clear( q );
+    mpz_clear( e );
+    mpz_clear( d );
+    mpz_clear( n );
     mpz_clear( totient );
-}
-
-void make_and_print_keys(){
-
-    
-    mpz_t p, q, e, d, n, m, mc, cm ;
-    mpz_init( p );
-    mpz_init( q );
-    mpz_init( e );
-    mpz_init( d );
-    mpz_init( n );
-    mpz_init( mc );
-    mpz_init( cm );
-    mpz_init_set_ui( m, 65 );
-    mpz_set_str( p, "15485863", 10 );
-    mpz_set_str( q, "13849831", 10 );
-
-    key_gen( d, e, n, p, q );
 }
 /*
 void encrypt(){
     mpz_powm( cm, m, e, n );
     mpz_powm( mc, cm, d, n );
 
-    mpz_out_str( stdout, 10, m );
-    printf( "\n" );
-    mpz_out_str( stdout, 10, cm );
-    printf( "\n" );
-    mpz_out_str( stdout, 10, mc );
-    printf( "\n" );
+}*/
 
-    mpz_clear( p );
-    mpz_clear( q );
-    mpz_clear( e );
-    mpz_clear( d );
-    mpz_clear( n );
-    mpz_clear( m );
-    mpz_clear( mc );
-    mpz_clear( cm );
-}
-*/
 void find_and_print_prime(){
     mpz_t p, iters, counter;
     mpz_init_set_str( p, "15485863", 10 );
@@ -157,9 +148,60 @@ void find_and_print_prime(){
     printf( "found prime:\n" );
     mpz_out_str( stdout, 10, p );
     printf( "\n" );
+    mpz_clear( p );
+    mpz_clear( iters );
+    mpz_clear( counter );
+}
+
+/**
+  *
+  * r is the return value, m is the message, ed is the exponent, n is the mod factor
+  *
+ **/
+void cryptwork( mpz_t r, mpz_t m, mpz_t ed, mpz_t n ){
+    //mpz_powm( r, m, ed, n );
+    mpz_t iters, counter, holder;
+    mpz_init_set( iters, ed );
+    mpz_init_set_ui( counter, 0 );
+    mpz_init_set( holder, m );
+    for( ; mpz_cmp( iters, counter ) > 0 ; mpz_add_ui( counter, counter, 1 ) ){
+        mpz_mul( holder, holder, holder );
+        mpz_mod( holder, holder, n );
+    }
+    mpz_set( r, holder );
 }
 
 int main(){
-    find_and_print_prime();
+    // Do not enable this during testing
+    //find_and_print_prime();
+    // Do not enable this during testing
+    //key_gen();
+
+    mpz_t m, e, d, n, iters, counter;
+    mpz_init_set_str( iters, "1", 10 );
+    mpz_init_set_str( counter, "0", 10 );
+    mpz_init_set_str( m, "64", 10 );
+    mpz_init_set_str( e, "830738740898882569", 10 );
+    mpz_init_set_str( d, "2461176518949177529", 10 );
+    mpz_init_set_str( n, "4241621275235948237", 10 );
+
+    for( ; mpz_cmp( iters, counter ) > 0 ; mpz_add_ui( counter, counter, 1 ) ){
+        printf( "sta msg: " );
+        mpz_out_str( stdout, 10, m );
+        cryptwork( m, m, e, n );
+        printf( "\nmid msg: " );
+        mpz_out_str( stdout, 10, m );
+        cryptwork( m, m, d, n );
+        printf( "\nend msg: " );
+        mpz_out_str( stdout, 10, m );
+        printf( "\n" );
+    }
+
+    mpz_clear( m );
+    mpz_clear( e );
+    mpz_clear( d );
+    mpz_clear( n );
+    mpz_clear( iters );
+    mpz_clear( counter );
     return 0;
 }
