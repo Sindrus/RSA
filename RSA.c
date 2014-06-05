@@ -159,8 +159,8 @@ void find_and_print_prime(){
   *
  **/
 void cryptwork( mpz_t r, mpz_t m, mpz_t ed, mpz_t n ){
-    //mpz_powm( r, m, ed, n );
-    mpz_t iters, counter, holder;
+    mpz_powm( r, m, ed, n );
+/*    mpz_t iters, counter, holder;
     mpz_init_set( iters, ed );
     mpz_init_set_ui( counter, 0 );
     mpz_init_set( holder, m );
@@ -169,6 +169,9 @@ void cryptwork( mpz_t r, mpz_t m, mpz_t ed, mpz_t n ){
         mpz_mod( holder, holder, n );
     }
     mpz_set( r, holder );
+    mpz_pow( holder, holder, ed );
+    mpz_mod( holder, holder, n );
+    mpz_set( r, holder );*/ 
 }
 
 int main(){
@@ -178,7 +181,7 @@ int main(){
     //key_gen();
 
     mpz_t m, e, d, n, iters, counter;
-    mpz_init_set_str( iters, "1", 10 );
+    mpz_init_set_str( iters, "10000", 10 );
     mpz_init_set_str( counter, "0", 10 );
     mpz_init_set_str( m, "64", 10 );
     mpz_init_set_str( e, "830738740898882569", 10 );
@@ -186,15 +189,15 @@ int main(){
     mpz_init_set_str( n, "4241621275235948237", 10 );
 
     for( ; mpz_cmp( iters, counter ) > 0 ; mpz_add_ui( counter, counter, 1 ) ){
-        printf( "sta msg: " );
-        mpz_out_str( stdout, 10, m );
+        //printf( "sta msg: " );
+        //mpz_out_str( stdout, 10, m );
         cryptwork( m, m, e, n );
-        printf( "\nmid msg: " );
-        mpz_out_str( stdout, 10, m );
+        //printf( "\nmid msg: " );
+        //mpz_out_str( stdout, 10, m );
         cryptwork( m, m, d, n );
-        printf( "\nend msg: " );
-        mpz_out_str( stdout, 10, m );
-        printf( "\n" );
+        //printf( "\nend msg: " );
+        //mpz_out_str( stdout, 10, m );
+        //printf( "\n" );
     }
 
     mpz_clear( m );
