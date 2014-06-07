@@ -241,25 +241,6 @@ void cryptwork3( mpz_t ret, mpz_t m, mpz_t ed, mpz_t n ){
         }
     }
 
-    /*mpz_init( F1 );
-    mpz_init( F2 );
-    mpz_init( F3 );
-    mpz_init( F4 );
-    mpz_init( F5 );
-    mpz_init( F6 );
-    mpz_init( F7 );
-*/
-    //mpz_powm_ui( F1,  
-
-/*    Mw = malloc( 1 );
-    mpz_init( wn );
-    for( int i = 0; i < mary; i++ ){
-        mpz_pow_ui( wn, m, i );
-        mpz_mod( wn, wn, ed );
-        Mw = realloc( Mw, i*sizeof( wn ) );
-        mpz_set( Mw[ i ], wn );
-    }
-*/    
     mpz_init( c );
     mpz_init( tmp );
 
@@ -285,126 +266,9 @@ void cryptwork3( mpz_t ret, mpz_t m, mpz_t ed, mpz_t n ){
         } 
     }
 
-    //for( int i = 0; i < mary; i++ ){
-    //    mpz_clear( Mw[ i ] );
-    //}
     mpz_set( m, c );
     mpz_clear( c );
     mpz_clear( tmp );
-    free( sr );
-  //  free( Mw );
-  //  mpz_clear( wn );
-}
-
-
-
-    // m-ary method (m=4)
-void cryptwork4( mpz_t ret, mpz_t m, mpz_t ed, mpz_t n ){
-    unsigned int r = 5;
-    unsigned int k = mpz_sizeinbase( ed, 2 );
-    unsigned int words = 0;
-    int l;
-    char *sr;
-    mpz_t *Fs, c, tmp, w1, w2, wn;
-
-    for( int i = 0; i < r ; i++ )
-        words += pow( 2, i );
-
-    if( k % r != 0 )
-        k += r - (k % r );
-
-    mpz_init( tmp );
-    sr = realloc( NULL, k );
-    if( sr == NULL ){
-        printf( "no memory\n" );
-        exit(0);
-    }
-    Fs = realloc( NULL, ( words+2 )*sizeof( mpz_t ) );
-    
-    l = 0;
-    for( int i=(int)k; i> 0; i-- ){
-        if( i > mpz_sizeinbase( ed, 2 ) ){
-            sr[ l ] = '0';
-        }else{
-            sr[ l ] = '0'+mpz_tstbit( ed, i-1 );
-        }
-        l++;
-    }
-    mpz_init_set_ui( w1, 1 );
-    mpz_set( Fs[ 0 ],  w1);
-    mpz_init_set( w2, m );
-    mpz_set( Fs[ 1 ], w2);
-    mpz_init( c );
-
-    printf( "checkpnt 3\n" );
-    mpz_init( wn );
-    
-    for( int j=2; j < words+1; j++ ){
-        printf( "checkpnt 3.1\n" );
-        
-        mpz_set_ui( wn, 0 );
-        printf( "checkpnt 3.2\n" );
-        
-        mpz_mul( wn, m, Fs[ j-1 ] );
-        printf( "checkpnt 3.3\n" );
-        
-        mpz_mod( wn, wn, n );
-    printf( "words: %d, j: %d Fs[ j ]: ", words, j );
-        mpz_out_str( stdout, 10, Fs[ j ] );
-        printf( " Fs[ j-1 ]: " );
-        mpz_out_str( stdout, 10, Fs[ j-1 ] );
-        printf( "\n" );
-        printf( "checkpnt 3.4\n" );
-
-        mpz_set( Fs[ j ], wn );
-        printf( "checkpnt 3.5\n" );
-    }
-
-    int dec = 0;
-    l = 0;
-    int pow2 = pow( 2, r );
-    for( ; l < r; l++ )
-        dec = dec * 2 + (sr[ l ] == '1' ? 1 : 0);
-    
-    printf( "checkpnt 4\n" );
-
-    mpz_set( c, Fs[ dec ] );
-    mpz_mod( c, c, n );
-
-    mpz_set_ui( tmp, 0 );
-
-    int s = k/r;
-    int bitshifter = 1;
-
-    for( int j = s-1; j > 0; j-- ){
-        dec = 0;
-        for( ; l < r + ( r*bitshifter ); l++ )
-            dec = dec * 2 + (sr[ l ] == '1' ? 1 : 0);
-        bitshifter++;
-
-        mpz_pow_ui( c, c, pow2 );
-        mpz_mod( c, c, n );
-
-        if( dec != 0 ){
-            mpz_pow_ui( tmp, m, dec );
-            mpz_mul( c, c, tmp );
-            mpz_mod( c, c, n );
-        }
-    }
-
-
-    mpz_set( m, c );
-
-    for( int j = 0; j < words + 1; j++ ){
-        mpz_clear( Fs[ j ] );
-    }
-
-    mpz_clear( c );
-    mpz_clear( *Fs );
-    mpz_clear( tmp );
-    mpz_clear( wn );
-    mpz_clear( w1 );
-    mpz_clear( w2 );
     free( sr );
 }
 
@@ -434,17 +298,17 @@ int main(){
     mpz_init_set_str( d, "60168529103217807457215739625313932459090284786427810715336228479238509896223033874391098363275751505399343770847939534385474634439233863790619424938210721808384463364528630008582097232617354876703150400867802883031780027222207051754481051114153874020172515304729886859552806529843974624349768412200514711035286208638490538556677504286855960942623882164556772033467467414481465500026601660865686672095514539368997705649551214699290529370492888982887322616204848495794626937850988076659532540225466298097011993239742592891128762038477015021854588252882262927236431853364262629394562129101256029791332729", 10 );
     mpz_init_set_str( n, "70738102528868186471077720460261394393246672392452678056007650479344300726348942698000587969531163078569497997607991868260711388840777586682289541117601777237999377487258658861824790826177878222028835045909883709706794196706296215964342884343045054229136096688991238599450607684923819690064080931120591125020412273715110238578228163621081501866503529231010252237313979351853892795839167121955267176666704119397719063529148722626864322912262553141859931616266426771709856206037226795783616256482968126275716075843040211871019386785926783785918898799853858777511894954373523255168865888428616599490385101", 10 );
     for( ; mpz_cmp( iters, counter ) > 0 ; mpz_add_ui( counter, counter, 1 ) ){
-        printf( "sta msg: " );
-        mpz_out_str( stdout, 10, m );
-        printf( "\n" );
+        //printf( "sta msg: " );
+        //mpz_out_str( stdout, 10, m );
+        //printf( "\n" );
         cryptwork3( m, m, e, n );
-        printf( "mid msg: " );
-        mpz_out_str( stdout, 10, m );
-        printf( "\n" );
+        //printf( "mid msg: " );
+        //mpz_out_str( stdout, 10, m );
+        //printf( "\n" );
         cryptwork3( m, m, d, n );
-        printf( "end msg: " );
-        mpz_out_str( stdout, 10, m );
-        printf( "\n" );
+        //printf( "end msg: " );
+        //mpz_out_str( stdout, 10, m );
+        //printf( "\n" );
     }
 
     mpz_clear( m );

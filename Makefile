@@ -10,7 +10,7 @@ testmod:
 	$(COMPILE) -o testmod test_mod_inv.c -lgmp
 
 rsa:
-	$(COMPILE) -o rsa RSA.c -lgmp -lm
+	$(COMPILE) -O3 -o rsa RSA.c -lgmp -lm
 
 clean:
 	rm rsa
